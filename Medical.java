@@ -23,8 +23,6 @@ abstract class Patient {
 
     public abstract void displayDetails();
 }
-
-
 class Inpatient extends Patient {
     private String roomNumber;
 
@@ -178,4 +176,4 @@ public class Medical{
         }
         scanner.close();
     }
-}
+} 
