@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Voter Eligibility Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            background-color: #f4f4f4;
+        }
+
+        h1, h3 {
+            text-align: center;
+        }
+
+        form {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+            width: 300px;
+            text-align: center;
+        }
+
+        input {
+            width: 90%;
+            padding: 10px;
+            margin: 10px 0;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+
+        button {
+            width: 48%;
+            padding: 10px;
+            margin: 5px;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+
+        button[type="submit"] {
+            background-color: #28a745;
+            color: white;
+        }
+
+        button[type="button"] {
+            background-color: #dc3545;
+            color: white;
+        }
+
+        button:hover {
+            opacity: 0.8;
+        }
+
+        #resultMessage {
+            font-size: 18px;
+            font-weight: bold;
+            color: #333;
+            margin-top: 15px;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Voters' Portal</h1>
+    <h3>Check your eligibility now</h3>
+
+    <form id="eligibilityForm">
+        <input type="text" name="name" id="name" placeholder="Enter your name" required>
+        <input type="number" name="age" id="age" placeholder="Enter your age" required>
+        <input type="text" name="nation" id="nation" placeholder="Enter your nationality" required>
+        
+        <button type="submit">Submit</button>
+        <button type="button" id="clearButton">Clear</button>
+    </form>
+
+    <p id="resultMessage"></p>
+
+    <script>
+        document.getElementById('eligibilityForm').addEventListener('submit', function(event) {
+            event.preventDefault();
+            checkEligibility();
+        });
+
+        document.getElementById('clearButton').addEventListener('click', function() {
+            document.getElementById('name').value = '';
+            document.getElementById('age').value = '';
+            document.getElementById('nation').value = '';
+            document.getElementById('resultMessage').textContent = '';
+        });
+
+        function checkEligibility() {
+            var userName = document.getElementById('name').value.trim();
+            var userAge = parseInt(document.getElementById('age').value);
+            var userNation = document.getElementById('nation').value.trim();
+
+            if (!userName) {
+                document.getElementById('resultMessage').textContent = "Please enter your name.";
+                return;
+            }
+
+            if (userNation.toLowerCase() === 'indian' && userAge >= 18) {
+                document.getElementById('resultMessage').textContent = userName + ", you are eligible to vote!";
+            } else {
+                document.getElementById('resultMessage').textContent = userName + ", you are not eligible to vote.";
+            }
+        }
+    </script>
+
+</body>
+</html>

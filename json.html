@@ -1,0 +1,55 @@
+=<!DOCTYPE html>/
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JSON</title>
+</head>
+<body>
+    <form id="loginForm">
+        <label for="name">User Name:       
+            <input type="text" name="name" placeholder="Enter name" id="name">
+        </label>
+        <br>
+        <label for="password">Password: 
+            <input type="password" name="password" placeholder="password" id="password">
+        </label>
+        <br>
+        <button type="submit">Submit</button>
+    </form>
+    <button id="show">Show Previous Login</button>
+    <ul id="list"></ul>
+    <script>
+        const form = document.querySelector('#loginForm');
+        const nameInput = document.querySelector('#name');
+        const passwordInput = document.querySelector('#password');
+        const list = document.querySelector('#list');
+
+        let data = JSON.parse(localStorage.getItem('data')) || [];
+
+        form.addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const name = nameInput.value;
+            const password = passwordInput.value;
+
+            if (name && password) {
+                const obj = { name, password };
+                data.push(obj);
+                localStorage.setItem('data', JSON.stringify(data));
+
+                form.reset();
+            } else {
+                alert("Please fill in both fields!");
+            }
+        });
+
+        document.querySelector('#show').addEventListener('click', function() {
+            list.innerHTML = "";
+            data.forEach(function(item) {
+                list.innerHTML += `<li>${item.name} - ${item.password}</li>`;
+            });
+        });
+    </script>
+</body>
+</html>

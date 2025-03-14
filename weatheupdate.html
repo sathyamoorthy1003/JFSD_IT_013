@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Alliance Weather Finder</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            min-height: 100vh;
+            background-size: cover;
+            background-position: center;
+            transition: background 0.5s ease;
+        }
+        
+        .weather-card {
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 15px;
+            padding: 2rem;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .clear { background-image: linear-gradient(120deg, #a1c4fd 0%, #c2e9fb 100%); }
+        .clouds { background-image: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%); }
+        .rain { background-image: linear-gradient(to right, #636fa4, #a8c0ff); }
+        .thunderstorm { background-image: linear-gradient(to right, #2c3e50, #3498db); }
+        .snow { background-image: linear-gradient(to top, #e6e9f0 0%, #eef1f5 100%); }
+        .default { background-image: linear-gradient(120deg, #f6d365 0%, #fda085 100%); }
+    </style>
+</head>
+<body class="d-flex align-items-center default">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-md-6">
+                <div class="weather-card text-center">
+                    <h1 class="mb-4">⛅ Alliance Weather Finder</h1>
+                    <form class="mb-4">
+                        <div class="input-group">
+                            <input type="text" class="form-control" name="city" 
+                                   placeholder="Enter city" id="cityInput">
+                            <button class="btn btn-primary" type="submit" 
+                                    onclick="getweather(event)">Search</button>
+                        </div>
+                    </form>
+
+                    <div class="weather-info">
+                        <h2 id="city" class="mb-3">🌍 City Name</h2>
+                        <p class="fs-5">🌡️ Temperature: <span id="temp" class="badge bg-primary"></span></p>
+                        <p class="fs-5">❄️ Min Temp: <span id="tmin" class="badge bg-info"></span></p>
+                        <p class="fs-5">🔥 Max Temp: <span id="tmax" class="badge bg-danger"></span></p>
+                        <p class="fs-5">💧 Humidity: <span id="humidity" class="badge bg-success"></span></p>
+                        <p class="fs-5">🌪️ Wind Speed: <span id="speed" class="badge bg-warning"></span></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        const api = {
+            base: "https://api.openweathermap.org/data/2.5/weather?q=",
+            key: "c4b84a6c0984c8aedbf3261dc622ca5f&units=metric"
+        };
+
+        function getweather(event) {
+            event.preventDefault();
+            const cityname = document.getElementById('cityInput').value;
+            fetch(`${api.base}${cityname}&appid=${api.key}`)
+            .then(response => response.json())
+            .then(data => {
+                if (data.cod === 200) {
+                    showweather(data);
+                    updateBackground(data.weather[0].main.toLowerCase());
+                } else {
+                    alert('City not found!');
+                }
+            });
+        }
+
+        function showweather(data) {
+            document.getElementById('city').textContent = `${data.name}, ${data.sys.country}`;
+            document.getElementById('temp').textContent = `${data.main.temp} °C`;
+            document.getElementById('tmin').textContent = `${data.main.temp_min} °C`;
+            document.getElementById('tmax').textContent = `${data.main.temp_max} °C`;
+            document.getElementById('humidity').textContent = `${data.main.humidity}%`;
+            document.getElementById('speed').textContent = `${data.wind.speed} m/s`;
+        }
+
+        function updateBackground(weatherCondition) {
+            const body = document.body;
+            body.className = 'd-flex align-items-center'; // Reset classes
+            
+            switch(weatherCondition) {
+                case 'clear':
+                    body.classList.add('clear');
+                    break;
+                case 'clouds':
+                    body.classList.add('clouds');
+                    break;
+                case 'rain':
+                    body.classList.add('rain');
+                    break;
+                case 'thunderstorm':
+                    body.classList.add('thunderstorm');
+                    break;
+                case 'snow':
+                    body.classList.add('snow');
+                    break;
+                default:
+                    body.classList.add('default');
+            }
+        }
+    </script>
+</body>
+</html>
