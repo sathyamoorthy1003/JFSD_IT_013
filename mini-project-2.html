@@ -1,0 +1,511 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hospital Management System</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f0f4f8;
+        }
+
+        .login-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        .login-form {
+            background: white;
+            padding: 2rem;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+
+        .nav-bar {
+            background: #2c3e50;
+            color: white;
+            padding: 1rem;
+            display: flex;
+            gap: 1rem;
+        }
+
+        .nav-button {
+            background: none;
+            border: none;
+            color: white;
+            cursor: pointer;
+            padding: 0.5rem 1rem;
+        }
+
+        .nav-button:hover {
+            background: #34495e;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 2rem auto;
+            padding: 1rem;
+        }
+
+        .form-section {
+            background: white;
+            padding: 2rem;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            margin-bottom: 2rem;
+        }
+
+        .form-group {
+            margin-bottom: 1rem;
+        }
+
+        input, select, button {
+            width: 100%;
+            padding: 0.5rem;
+            margin-top: 0.5rem;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .dashboard {
+            margin-top: 2rem;
+        }
+
+        .status-box {
+            background: white;
+            padding: 1rem;
+            border-radius: 8px;
+            box-shadow: 0 0 5px rgba(0,0,0,0.1);
+            margin: 1rem 0;
+        }
+
+        .output {
+            margin-top: 20px;
+            padding: 15px;
+            background-color: #f8f9fa;
+            border-radius: 4px;
+        }
+
+        .patient-record {
+            margin-bottom: 15px;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body>
+    <!-- Login Screen -->
+    <div id="login-screen" class="login-container">
+        <div class="login-form">
+            <h2>Hospital Login</h2>
+            <select id="userType">
+                <option value="admin">Admin</option>
+                <option value="nurse">Nurse</option>
+            </select>
+            <div class="form-group">
+                <input type="text" id="username" placeholder="Username">
+            </div>
+            <div class="form-group">
+                <input type="password" id="password" placeholder="Password">
+            </div>
+            <button onclick="handleLogin()">Login</button>
+        </div>
+    </div>
+
+    <!-- Admin Dashboard -->
+    <div id="admin-dashboard" class="hidden">
+        <div class="nav-bar">
+            <button class="nav-button" onclick="showSection('manage-doctors')">Manage Doctors</button>
+            <button class="nav-button" onclick="showSection('manage-beds')">Manage Beds</button>
+            <button class="nav-button" onclick="logout()">Logout</button>
+        </div>
+
+        <div class="container">
+            <!-- Manage Doctors Section -->
+            <div id="manage-doctors" class="form-section">
+                <h3>Add Doctor Availability</h3>
+                <div class="form-group">
+                    <input type="text" id="doctor-name" placeholder="Doctor Name">
+                </div>
+                <div class="form-group">
+                    <input type="date" id="doctor-availability-date">
+                </div>
+                <button onclick="addDoctorAvailability()">Add Availability</button>
+            </div>
+
+            <!-- Manage Beds Section -->
+            <div id="manage-beds" class="form-section hidden">
+                <h3>Bed Management</h3>
+                <div id="bed-status-container"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Nurse Dashboard -->
+    <div id="nurse-dashboard" class="hidden">
+        <div class="nav-bar">
+            <button class="nav-button" onclick="showSection('add-patient')">Add Patient</button>
+            <button class="nav-button" onclick="showSection('schedule')">Schedule Appointment</button>
+            <button class="nav-button" onclick="showSection('discharge')">Discharge Patient</button>
+            <button class="nav-button" onclick="showSection('records')">View Records</button>
+            <button class="nav-button" onclick="logout()">Logout</button>
+        </div>
+
+        <div class="container">
+            <!-- Add Patient Section -->
+            <div id="add-patient" class="form-section">
+                <h3>Add Patient</h3>
+                <div class="form-group">
+                    <input type="text" id="patient-name" placeholder="Name">
+                </div>
+                <div class="form-group">
+                    <input type="number" id="patient-id" placeholder="ID">
+                </div>
+                <div class="form-group">
+                    <input type="text" id="medical-history" placeholder="Medical History">
+                </div>
+                <div class="form-group">
+                    <select id="patient-type" onchange="togglePatientFields()">
+                        <option value="inpatient">Inpatient</option>
+                        <option value="outpatient">Outpatient</option>
+                    </select>
+                </div>
+                <div class="form-group" id="room-number-group">
+                    <input type="text" id="room-number" placeholder="Room Number">
+                </div>
+                <div class="form-group hidden" id="appointment-date-group">
+                    <input type="date" id="appointment-date">
+                </div>
+                <button onclick="handleAddPatient()">Add Patient</button>
+            </div>
+
+            <!-- Schedule Appointment Section -->
+            <div id="schedule" class="form-section hidden">
+                <h3>Schedule Appointment</h3>
+                <div class="form-group">
+                    <input type="text" id="schedule-patient" placeholder="Patient Name">
+                </div>
+                <div class="form-group">
+                    <select id="doctor-list" onchange="populateTimeSlots()"></select>
+                </div>
+                <div class="form-group">
+                    <select id="time-slot"></select>
+                </div>
+                <button onclick="handleScheduleAppointment()">Schedule</button>
+            </div>
+
+            <!-- Discharge Patient Section -->
+            <div id="discharge" class="form-section hidden">
+                <h3>Discharge Patient</h3>
+                <div class="form-group">
+                    <input type="text" id="discharge-name" placeholder="Patient Name">
+                </div>
+                <button onclick="handleDischarge()">Discharge</button>
+            </div>
+
+            <!-- Patient Records Section -->
+            <div id="records" class="form-section hidden">
+                <h3>Patient Records</h3>
+                <div id="records-output" class="output"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Local Storage Keys
+        const LS_KEYS = {
+            USERS: 'hospital_users',
+            PATIENTS: 'hospital_patients',
+            DOCTORS: 'hospital_doctors',
+            BEDS: 'hospital_beds'
+        };
+
+        // Initialize Local Storage
+        function initializeStorage() {
+            if (!localStorage.getItem(LS_KEYS.USERS)) {
+                const defaultUsers = [
+                    { username: 'admin', password: 'admin123', role: 'admin' },
+                    { username: 'nurse', password: 'nurse123', role: 'nurse' }
+                ];
+                localStorage.setItem(LS_KEYS.USERS, JSON.stringify(defaultUsers));
+            }
+
+            if (!localStorage.getItem(LS_KEYS.BEDS)) {
+                const beds = Array.from({ length: 20 }, (_, i) => ({
+                    id: i + 1,
+                    status: 'free'
+                }));
+                localStorage.setItem(LS_KEYS.BEDS, JSON.stringify(beds));
+            }
+
+            if (!localStorage.getItem(LS_KEYS.PATIENTS)) {
+                localStorage.setItem(LS_KEYS.PATIENTS, JSON.stringify([]));
+            }
+
+            if (!localStorage.getItem(LS_KEYS.DOCTORS)) {
+                localStorage.setItem(LS_KEYS.DOCTORS, JSON.stringify([]));
+            }
+        }
+
+        // Hospital Data Management
+        const hospital = {
+            getPatients() {
+                return JSON.parse(localStorage.getItem(LS_KEYS.PATIENTS)) || [];
+            },
+
+            getDoctors() {
+                return JSON.parse(localStorage.getItem(LS_KEYS.DOCTORS)) || [];
+            },
+
+            getBeds() {
+                return JSON.parse(localStorage.getItem(LS_KEYS.BEDS)) || [];
+            },
+
+            addPatient(patient) {
+                const patients = this.getPatients();
+                patients.push(patient);
+                localStorage.setItem(LS_KEYS.PATIENTS, JSON.stringify(patients));
+            },
+
+            dischargePatient(patientName) {
+                const patients = this.getPatients();
+                const updatedPatients = patients.filter(p => p.patientName !== patientName);
+                localStorage.setItem(LS_KEYS.PATIENTS, JSON.stringify(updatedPatients));
+            },
+
+            addDoctorAvailability(doctorName, date) {
+                const doctors = this.getDoctors();
+                const existing = doctors.find(d => d.name === doctorName);
+                
+                if (existing) {
+                    if (!existing.dates.includes(date)) {
+                        existing.dates.push(date);
+                    }
+                } else {
+                    doctors.push({
+                        name: doctorName,
+                        dates: [date]
+                    });
+                }
+                
+                localStorage.setItem(LS_KEYS.DOCTORS, JSON.stringify(doctors));
+            },
+
+            getDoctorAvailability(doctorName) {
+                const doctors = this.getDoctors();
+                const doctor = doctors.find(d => d.name === doctorName);
+                return doctor ? doctor.dates : [];
+            },
+
+            updateBedStatus(bedId, status) {
+                const beds = this.getBeds();
+                const bed = beds.find(b => b.id === bedId);
+                if (bed) bed.status = status;
+                localStorage.setItem(LS_KEYS.BEDS, JSON.stringify(beds));
+            }
+        };
+
+        // Login Handling
+        function handleLogin() {
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+            const role = document.getElementById('userType').value;
+            
+            const users = JSON.parse(localStorage.getItem(LS_KEYS.USERS));
+            const validUser = users.find(u => 
+                u.username === username && 
+                u.password === password && 
+                u.role === role
+            );
+
+            if (validUser) {
+                document.getElementById('login-screen').classList.add('hidden');
+                if (role === 'admin') {
+                    document.getElementById('admin-dashboard').classList.remove('hidden');
+                    showBedStatus();
+                } else {
+                    document.getElementById('nurse-dashboard').classList.remove('hidden');
+                    populateDoctorList();
+                    displayPatientRecords();
+                }
+            } else {
+                alert('Invalid credentials!');
+            }
+        }
+
+        // Admin Functions
+        function showBedStatus() {
+            const beds = hospital.getBeds();
+            const container = document.getElementById('bed-status-container');
+            container.innerHTML = '';
+            
+            beds.forEach(bed => {
+                const bedDiv = document.createElement('div');
+                bedDiv.className = 'status-box';
+                bedDiv.innerHTML = `
+                    Bed ${bed.id} - ${bed.status}
+                    <button onclick="toggleBedStatus(${bed.id})">
+                        Mark as ${bed.status === 'free' ? 'Occupied' : 'Free'}
+                    </button>
+                `;
+                container.appendChild(bedDiv);
+            });
+        }
+
+        function toggleBedStatus(bedId) {
+            const beds = hospital.getBeds();
+            const bed = beds.find(b => b.id === bedId);
+            bed.status = bed.status === 'free' ? 'occupied' : 'free';
+            localStorage.setItem(LS_KEYS.BEDS, JSON.stringify(beds));
+            showBedStatus();
+        }
+
+        function addDoctorAvailability() {
+            const name = document.getElementById('doctor-name').value;
+            const date = document.getElementById('doctor-availability-date').value;
+            if (!name || !date) {
+                alert('Please fill all fields!');
+                return;
+            }
+            hospital.addDoctorAvailability(name, date);
+            alert('Availability added!');
+        }
+
+        // Nurse Functions
+        function populateDoctorList() {
+            const doctors = hospital.getDoctors();
+            const select = document.getElementById('doctor-list');
+            select.innerHTML = '<option value="">Select Doctor</option>';
+            
+            doctors.forEach(doctor => {
+                const option = document.createElement('option');
+                option.value = doctor.name;
+                option.textContent = doctor.name;
+                select.appendChild(option);
+            });
+        }
+
+        function populateTimeSlots() {
+            const doctorName = document.getElementById('doctor-list').value;
+            const date = new Date().toISOString().split('T')[0]; // Default to today
+            const slots = generateTimeSlots();
+            const select = document.getElementById('time-slot');
+            select.innerHTML = '<option value="">Select Time Slot</option>';
+            
+            slots.forEach(slot => {
+                const option = document.createElement('option');
+                option.value = slot;
+                option.textContent = slot;
+                select.appendChild(option);
+            });
+        }
+
+        function generateTimeSlots() {
+            const slots = [];
+            for (let hour = 9; hour <= 16; hour++) {
+                slots.push(`${hour}:00 - ${hour + 1}:00`);
+            }
+            return slots;
+        }
+
+        function handleAddPatient() {
+            const name = document.getElementById('patient-name').value;
+            const id = parseInt(document.getElementById('patient-id').value);
+            const history = document.getElementById('medical-history').value;
+            const type = document.getElementById('patient-type').value;
+
+            if (!name || !id || !history) {
+                alert('Please fill all required fields!');
+                return;
+            }
+
+            let patient;
+            if (type === 'inpatient') {
+                const room = document.getElementById('room-number').value;
+                patient = { patientName: name, patientId: id, medicalHistory: history, roomNumber: room, type: 'Inpatient' };
+            } else {
+                const date = document.getElementById('appointment-date').value;
+                patient = { patientName: name, patientId: id, medicalHistory: history, appointmentDate: date, type: 'Outpatient' };
+            }
+
+            hospital.addPatient(patient);
+            alert('Patient added successfully!');
+            displayPatientRecords();
+        }
+
+        function handleScheduleAppointment() {
+            const patientName = document.getElementById('schedule-patient').value;
+            const doctorName = document.getElementById('doctor-list').value;
+            const timeSlot = document.getElementById('time-slot').value;
+
+            if (!patientName || !doctorName || !timeSlot) {
+                alert('Please fill all fields!');
+                return;
+            }
+
+            alert(`Appointment scheduled for ${patientName} with Dr. ${doctorName} at ${timeSlot}`);
+        }
+
+        function handleDischarge() {
+            const patientName = document.getElementById('discharge-name').value;
+            hospital.dischargePatient(patientName);
+            alert(`Patient ${patientName} has been discharged.`);
+            displayPatientRecords();
+        }
+
+        function displayPatientRecords() {
+            const patients = hospital.getPatients();
+            const output = document.getElementById('records-output');
+            output.innerHTML = '';
+
+            if (patients.length === 0) {
+                output.innerHTML = 'No patient records found!';
+                return;
+            }
+
+            patients.forEach(patient => {
+                const div = document.createElement('div');
+                div.className = 'patient-record';
+                div.innerHTML = `
+                    <strong>${patient.type} Details:</strong><br>
+                    Name: ${patient.patientName}<br>
+                    ID: ${patient.patientId}<br>
+                    Medical History: ${patient.medicalHistory}<br>
+                    ${patient.type === 'Inpatient' ? 
+                      `Room Number: ${patient.roomNumber}` : 
+                      `Appointment Date: ${patient.appointmentDate}`}
+                `;
+                output.appendChild(div);
+            });
+        }
+
+        function showSection(sectionId) {
+            document.querySelectorAll('.form-section').forEach(section => {
+                section.classList.add('hidden');
+            });
+            document.getElementById(sectionId).classList.remove('hidden');
+        }
+
+        function togglePatientFields() {
+            const type = document.getElementById('patient-type').value;
+            document.getElementById('room-number-group').classList.toggle('hidden', type !== 'inpatient');
+            document.getElementById('appointment-date-group').classList.toggle('hidden', type !== 'outpatient');
+        }
+
+        function logout() {
+            window.location.reload();
+        }
+
+        // Initialize
+        initializeStorage();
+    </script>
+</body>
+</html>
